@@ -321,12 +321,12 @@ export const usePuterStore = create<PuterStore>((set, get) => {
             setError("Puter.js not available");
             return;
         }
-        // return puter.ai.chat(prompt, imageURL, testMode, options);
         return puter.ai.chat(prompt, imageURL, testMode, options) as Promise<
             AIResponse | undefined
         >;
     };
 
+    // VERSIÓN MEJORADA CON MÚLTIPLES INTENTOS
     const feedback = async (path: string, message: string) => {
         const puter = getPuter();
         if (!puter) {
@@ -334,24 +334,105 @@ export const usePuterStore = create<PuterStore>((set, get) => {
             return;
         }
 
-        return puter.ai.chat(
-            [
-                {
-                    role: "user",
-                    content: [
+        // Lista de modelos a probar en orden
+        const modelsToTry = [
+            "claude-sonnet-4",       // 🥇 Mejor para leer y analizar documentos
+            "claude-3-5-sonnet",     // 🥈 Alternativa confiable de Claude
+            "gpt-4o",                // 🥉 Excelente de OpenAI
+            "gpt-4o-mini",           // ⚡ Más rápido y económico
+            "claude-opus-4",         // 💪 Muy potente pero más lento
+            "gemini-2.0-flash",      // 🚀 Rápido de Google
+            "gpt-4.1",               // 📝 Buena opción de GPT
+            "deepseek-chat",         // 🆕 Alternativa emergente
+        ];
+
+        let lastError = null;
+
+        for (const model of modelsToTry) {
+            try {
+                console.log(`🔄 Intentando con modelo: ${model}`);
+                console.log(`📄 Archivo path: ${path}`);
+                console.log(`💬 Mensaje: ${message.substring(0, 100)}...`);
+
+                const response = await puter.ai.chat(
+                    [
                         {
-                            type: "file",
-                            puter_path: path,
-                        },
-                        {
-                            type: "text",
-                            text: message,
+                            role: "user",
+                            content: [
+                                {
+                                    type: "file",
+                                    puter_path: path,
+                                },
+                                {
+                                    type: "text",
+                                    text: message,
+                                },
+                            ],
                         },
                     ],
-                },
-            ],
-            { model: "claude-3-7-sonnet" }
-        ) as Promise<AIResponse | undefined>;
+                    {
+                        model: model,
+                        max_tokens: 2000,
+                        temperature: 0.5
+                    } as PuterChatOptions
+                );
+
+                console.log(`✅ Éxito con modelo: ${model}`);
+                console.log(`📦 Respuesta:`, response);
+
+                return response as Promise<AIResponse | undefined>;
+            } catch (error) {
+                console.error(`❌ Error con modelo ${model}:`, error);
+                // Log del error completo con stringify
+                if (error && typeof error === 'object') {
+                    console.error(`❌ Error detallado:`, JSON.stringify(error, null, 2));
+                }
+                lastError = error;
+
+                // Si el error es sobre el modelo, continuar al siguiente
+                if (error && typeof error === 'object' && 'code' in error && error.code === 'field_invalid') {
+                    continue;
+                }
+
+                // Si es otro tipo de error, también intentar el siguiente modelo
+                continue;
+            }
+        }
+
+        // Si ningún modelo funcionó, intentar SIN especificar modelo (usa el default)
+        try {
+            console.log(`🔄 Intentando SIN especificar modelo (usando default)`);
+
+            const response = await puter.ai.chat(
+                [
+                    {
+                        role: "user",
+                        content: [
+                            {
+                                type: "file",
+                                puter_path: path,
+                            },
+                            {
+                                type: "text",
+                                text: message,
+                            },
+                        ],
+                    },
+                ],
+                {
+                    max_tokens: 2000,
+                    temperature: 0.5
+                } as PuterChatOptions
+            );
+
+            console.log(`✅ Éxito con modelo default`);
+            console.log(`📦 Respuesta:`, response);
+
+            return response as Promise<AIResponse | undefined>;
+        } catch (error) {
+            console.error(`❌ Error con modelo default:`, error);
+            throw lastError || error;
+        }
     };
 
     const img2txt = async (image: string | File | Blob, testMode?: boolean) => {

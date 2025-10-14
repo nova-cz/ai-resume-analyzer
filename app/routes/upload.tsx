@@ -46,44 +46,17 @@ const Upload = () => {
 
         setStatusText('Analyzing...');
 
-        setStatusText('Calling AI for feedback...');
-        
-        try {
-            const feedback = await ai.feedback(
-                uploadedFile.path,
-                prepareInstructions({ jobTitle, jobDescription })
-            );
-            
-            if (!feedback) {
-                console.error('No feedback received from AI');
-                return setStatusText('Error: No response from AI service');
-            }
-            
-            console.log('Raw AI Response:', JSON.stringify(feedback, null, 2));
-            
-            let feedbackText: string;
-            
-            if (typeof feedback.message?.content === 'string') {
-                feedbackText = feedback.message.content;
-            } else if (Array.isArray(feedback.message?.content) && feedback.message.content[0]?.text) {
-                feedbackText = feedback.message.content[0].text;
-            } else {
-                console.error('Unexpected feedback format:', feedback);
-                return setStatusText('Error: Unexpected response format from AI');
-            }
-            
-            try {
-                data.feedback = JSON.parse(feedbackText);
-            } catch (parseError) {
-                console.error('Failed to parse feedback:', parseError);
-                console.error('Feedback text that failed to parse:', feedbackText);
-                return setStatusText('Error: Invalid response format from AI');
-            }
-        } catch (error: unknown) {
-            console.error('Error getting AI feedback:', error);
-            const errorMessage = error instanceof Error ? error.message : 'Failed to process resume';
-            return setStatusText(`Error: ${errorMessage}`);
-        }
+        const feedback = await ai.feedback(
+            uploadedFile.path,
+            prepareInstructions({ jobTitle, jobDescription })
+        )
+        if (!feedback) return setStatusText('Error: Failed to analyze resume');
+
+        const feedbackText = typeof feedback.message.content === 'string'
+            ? feedback.message.content
+            : feedback.message.content[0].text;
+
+        data.feedback = JSON.parse(feedbackText);
         await kv.set(`resume:${uuid}`, JSON.stringify(data));
         setStatusText('Analysis complete, redirecting...');
         console.log(data);
