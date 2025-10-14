@@ -10,7 +10,7 @@ declare global {
                 signOut: () => Promise<void>;
             };
             fs: {
-                write: (
+                write: (  
                     path: string,
                     data: string | File | Blob
                 ) => Promise<File | undefined>;
