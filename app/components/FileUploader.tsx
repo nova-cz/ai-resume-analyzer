@@ -7,23 +7,30 @@ interface FileUploaderProps {
 }
 
 const FileUploader = ({ onFileSelect }: FileUploaderProps) => {
-    const onDrop = useCallback((acceptedFiles: File[]) => {
-        const file = acceptedFiles[0] || null;
-
-        onFileSelect?.(file);
-    }, [onFileSelect]);
-
+    const [file, setFile] = useState<File | null>(null);
     const maxFileSize = 20 * 1024 * 1024; // 20MB in bytes
 
-    const {getRootProps, getInputProps, isDragActive, acceptedFiles} = useDropzone({
+    const onDrop = useCallback(
+        (acceptedFiles: File[]) => {
+            const newFile = acceptedFiles[0] || null;
+            setFile(newFile);
+            onFileSelect?.(newFile);
+        },
+        [onFileSelect]
+    );
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         multiple: false,
-        accept: { 'application/pdf': ['.pdf']},
+        accept: { 'application/pdf': ['.pdf'] },
         maxSize: maxFileSize,
-    })
+    });
 
-    const file = acceptedFiles[0] || null;
-
+    const handleRemoveFile = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setFile(null);
+        onFileSelect?.(null);
+    };
 
 
     return (
@@ -45,10 +52,13 @@ const FileUploader = ({ onFileSelect }: FileUploaderProps) => {
                                     </p>
                                 </div>
                             </div>
-                            <button className="p-2 cursor-pointer" onClick={(e) => {
-                                onFileSelect?.(null)
-                            }}>
-                                <img src="/icons/cross.svg" alt="remove" className="w-4 h-4" />
+                            <button 
+                                type="button"
+                                className="p-2 cursor-pointer hover:bg-gray-100 rounded-full"
+                                onClick={handleRemoveFile}
+                                aria-label="Remove file"
+                            >
+                                <img src="/icons/cross.svg" alt="Remove" className="w-4 h-4" />
                             </button>
                         </div>
                     ): (
