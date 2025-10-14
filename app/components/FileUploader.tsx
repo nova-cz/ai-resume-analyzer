@@ -1,36 +1,29 @@
 import {useState, useCallback} from 'react'
 import {useDropzone} from 'react-dropzone'
-import { formatSize } from '~/lib/utils'
+import { formatSize } from '../lib/utils'
 
 interface FileUploaderProps {
     onFileSelect?: (file: File | null) => void;
 }
 
 const FileUploader = ({ onFileSelect }: FileUploaderProps) => {
-    const [file, setFile] = useState<File | null>(null);
+    const onDrop = useCallback((acceptedFiles: File[]) => {
+        const file = acceptedFiles[0] || null;
+
+        onFileSelect?.(file);
+    }, [onFileSelect]);
+
     const maxFileSize = 20 * 1024 * 1024; // 20MB in bytes
 
-    const onDrop = useCallback(
-        (acceptedFiles: File[]) => {
-            const newFile = acceptedFiles[0] || null;
-            setFile(newFile);
-            onFileSelect?.(newFile);
-        },
-        [onFileSelect]
-    );
-
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    const {getRootProps, getInputProps, isDragActive, acceptedFiles} = useDropzone({
         onDrop,
         multiple: false,
-        accept: { 'application/pdf': ['.pdf'] },
+        accept: { 'application/pdf': ['.pdf']},
         maxSize: maxFileSize,
-    });
+    })
 
-    const handleRemoveFile = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setFile(null);
-        onFileSelect?.(null);
-    };
+    const file = acceptedFiles[0] || null;
+
 
 
     return (
@@ -52,13 +45,10 @@ const FileUploader = ({ onFileSelect }: FileUploaderProps) => {
                                     </p>
                                 </div>
                             </div>
-                            <button 
-                                type="button"
-                                className="p-2 cursor-pointer hover:bg-gray-100 rounded-full"
-                                onClick={handleRemoveFile}
-                                aria-label="Remove file"
-                            >
-                                <img src="/icons/cross.svg" alt="Remove" className="w-4 h-4" />
+                            <button className="p-2 cursor-pointer" onClick={(e) => {
+                                onFileSelect?.(null)
+                            }}>
+                                <img src="/icons/cross.svg" alt="remove" className="w-4 h-4" />
                             </button>
                         </div>
                     ): (

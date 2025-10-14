@@ -10,7 +10,7 @@ declare global {
                 signOut: () => Promise<void>;
             };
             fs: {
-                write: (  
+                write: (
                     path: string,
                     data: string | File | Blob
                 ) => Promise<File | undefined>;
@@ -99,7 +99,7 @@ interface PuterStore {
 const getPuter = (): typeof window.puter | null =>
     typeof window !== "undefined" && window.puter ? window.puter : null;
 
-export const usePuterStore = create < PuterStore > ((set, get) => {
+export const usePuterStore = create<PuterStore>((set, get) => {
     const setError = (msg: string) => {
         set({
             error: msg,
@@ -350,7 +350,7 @@ export const usePuterStore = create < PuterStore > ((set, get) => {
                     ],
                 },
             ],
-            { model: "claude-sonnet-4" }
+            { model: "claude-3-7-sonnet" }
         ) as Promise<AIResponse | undefined>;
     };
 
