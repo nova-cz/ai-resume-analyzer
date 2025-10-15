@@ -336,14 +336,51 @@ export const usePuterStore = create<PuterStore>((set, get) => {
 
         // Lista de modelos a probar en orden
         const modelsToTry = [
-            "claude-sonnet-4",       // 🥇 Mejor para leer y analizar documentos
-            "claude-3-5-sonnet",     // 🥈 Alternativa confiable de Claude
-            "gpt-4o",                // 🥉 Excelente de OpenAI
-            "gpt-4o-mini",           // ⚡ Más rápido y económico
-            "claude-opus-4",         // 💪 Muy potente pero más lento
-            "gemini-2.0-flash",      // 🚀 Rápido de Google
-            "gpt-4.1",               // 📝 Buena opción de GPT
-            "deepseek-chat",         // 🆕 Alternativa emergente
+            // Modelos OpenAI (GPT) - Recomendados
+            "gpt-4o-mini",           // ⭐ Rápido y eficiente
+            "gpt-4o",                // ⭐ Muy potente
+            "o1",
+            "o1-mini",
+            "o1-pro",
+            "o3",
+            "o3-mini",
+            "o4-mini",
+            "gpt-5",
+            "gpt-5-mini",
+            "gpt-5-nano",
+            "gpt-5-chat-latest",
+            "gpt-4.1",
+            "gpt-4.1-mini",
+            "gpt-4.1-nano",          // Modelo predeterminado
+            "gpt-4.5-preview",
+
+            // Modelos Anthropic (Claude) - Excelentes para documentos
+            "claude-sonnet-4",       // ⭐⭐ Mejor para análisis de PDFs
+            "claude-opus-4",
+            "claude-3-7-sonnet",
+            "claude-3-5-sonnet",     // ⭐ Muy confiable
+
+            // Modelos DeepSeek
+            "deepseek-chat",
+            "deepseek-reasoner",
+
+            // Modelos Google (Gemini)
+            "gemini-2.0-flash",
+            "gemini-1.5-flash",
+
+            // Modelos Meta (Llama)
+            "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+            "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+
+            // Modelos Mistral
+            "mistral-large-latest",
+            "pixtral-large-latest",
+            "codestral-latest",
+
+            // Otros
+            "google/gemma-2-27b-it",
+            "grok-beta"
         ];
 
         let lastError = null;
