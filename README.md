@@ -16,6 +16,10 @@
   <img src="./Home.png" alt="AI Resume Analyzer Dashboard" width="800"/>
 </div>
 
+## 🎯 Objective
+
+AI Resume Analyzer is designed to help students and recent graduates create powerful, ATS-optimized resumes that significantly increase their chances of landing internships and job opportunities. Our mission is to bridge the gap between academic achievements and professional requirements by providing intelligent, personalized feedback that transforms ordinary resumes into compelling career assets.
+
 ## ✨ Features
 
 - **AI-Powered Analysis**: Get instant feedback on your resume's content, layout, and impact
@@ -36,6 +40,7 @@
 - **Routing**: React Router v7
 - **PDF Processing**: PDF.js
 - **AI Integration**: Anthropic Claude API
+- **Cloud Integration**: Puter.js for seamless cloud storage and file management
 
 ### Development Tools
 - **Package Manager**: npm
